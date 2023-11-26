@@ -1,0 +1,415 @@
+<%- include("partials/main") %>
+
+    <head>
+        <%- include("partials/title-meta", {"title": "Users Table"}) %>
+
+        <!-- DataTables -->
+        <link href="assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+        <link href="assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+        <!-- Responsive datatable examples -->
+        <link href="assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" /> 
+        
+        <%- include("partials/head-css") %>
+
+        <style>
+            input[switch=bool]+label {
+                background-color:#f5b225;
+            }
+
+            input[switch=bool]:checked+label {
+                background-color: #58db83;
+            }
+        </style>
+    </head>
+
+    <body data-sidebar="dark">
+
+        <!-- Begin page -->
+        <div id="layout-wrapper">
+
+            <%- include("partials/topbar") %> <%- include("partials/sidebar") %>
+
+            <!-- ============================================================== -->
+            <!-- Start right Content here -->
+            <!-- ============================================================== -->
+            <div class="main-content">
+
+                <div class="page-content">
+                    <div class="container-fluid">
+
+                        <%- include("partials/page-title", {"pagetitle": "Lexa", "subtitle":"Tables" ,"title": "Data Table"}) %>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body">
+
+                                        <h4 class="card-title">Users Datatable</h4>
+                                        <p class="card-title-desc">All users from the server
+                                        </p>
+
+                                        <table id="datatable" class="table table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Email</th>
+                                                    <th>Phone</th>
+                                                    <th>Country</th>
+                                                    <th>Start date</th>
+                                                    <th>Balance</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <% users.forEach( function( user ) { %>
+                                                    <tr>
+                                                        <td><%- `${user.fname} ${user.lname}` %> </td>
+                                                        <td><%- user.email %></td>
+                                                        <td><%- user.phone %></td>
+                                                        <td><%- user.country %></td>
+                                                        <td>2011/04/25</td>
+                                                        <td>$<%- `${ user.balance.total  }` %></td>
+                                                        <td><button onclick="getDetails('<%-user._id%>')" type="button" class="btn btn-secondary btn-sm waves-effect waves-light">View</button></td>
+                                                    </tr>
+                                                <% }) %>
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end col -->
+                        </div>
+                        <!-- end row -->
+
+                        <div class="row" id="user-detail" style="display: none;">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="invoice-title">
+                                                        <h4 class="float-end font-size-16"><strong><span id="user-id"></span></strong></h4>
+                                                        <h3>
+                                                            Stackupcrypto 
+                                                        </h3>
+                                                    </div>
+                                                    <hr>
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <address>
+                                                                    <strong>Contact:</strong><br>
+                                                                    <span id="name"></span><br>
+                                                                    <span id="country"></span><br>
+                                                                    <span id="phone"></span><br>
+                                                                    <span id="email"></span><br>
+                                                                    <span id="user_password"></span>
+                                                                </address>
+                                                        </div>
+                                                        <div class="col-6 text-end">
+                                                            <address>
+                                                                    <strong>Balance:</strong><br>
+                                                                    profit: <span id="profit"></span><br>
+                                                                    bonus: <span id="bonus"></span><br>
+                                                                    ref bonus: <span id="ref_bonus"></span><br>
+                                                                    active: <span id="active"></span><br>
+                                                                    <strong><span id="total"></span></strong>
+                                                                </address>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-6 mt-4">
+                                                            <address>
+                                                                    <!-- <strong>Withdrawal Info:</strong><br> -->
+                                                                    <strong>Bank: </strong><br>
+                                                                    <span id="winf_banknm"></span><br>
+                                                                    <span id="winf_accnm"></span><br>
+                                                                    <span id="winf_accnum"></span><br>
+                                                                    <span id="winf_rn"></span><br />
+
+                                                                    <strong>Crypto:</strong><br>
+                                                                    <span id="winf_wa"></span><br/>
+                                                                    <strong>Cash App Tag:</strong><br>
+                                                                    <span id="winf_ct"></span>
+                                                                </address>
+                                                        </div>
+                                                        <div class="col-6 mt-4 text-end">
+                                                            <address>
+                                                                    <strong>Reg Date:</strong><br>
+                                                                    <span id="reg-date"></span><br><br>
+                                                                </address>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div id="trx-details">
+                                                        <div class="p-2">
+                                                            <h3 class="font-size-16"><strong>Transaction summary</strong></h3>
+                                                        </div>
+                                                        <div class="">
+                                                            <div class="table-responsive">
+                                                                <table class="table">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <td><strong>Type</strong></td>
+                                                                            <td class="text-center"><strong>Amount</strong></td>
+                                                                            <td class="text-center"><strong>Payment Mode</strong></td>
+                                                                            <td class="text-end"><strong>Status</strong></td>
+                                                                            <td class="text-end"><strong>Address</strong></td>
+                                                                            <td class="text-end"><strong>Date</strong></td>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody id="user-tbody">
+                                                                        <!-- foreach ($order->lineItems as $line) or some such thing here -->
+                                                                       
+                                                                        <tr id="sub-total">
+                                                                            <td class="thick-line"></td>
+                                                                            <td class="thick-line"></td>
+                                                                            <td class="thick-line"></td>
+                                                                            <td class="thick-line"></td>
+                                                                            <td class="thick-line text-center">
+                                                                                <strong>Deposits (Active)</strong></td>
+                                                                            <td id="dactive" class="thick-line text-end">$670.99</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="no-line"></td>
+                                                                            <td class="no-line"></td>
+                                                                            <td class="no-line"></td>
+                                                                            <td class="no-line"></td>
+                                                                            <td class="no-line text-center">
+                                                                                <strong>Withdrawals (Active)</strong></td>
+                                                                            <td id="wactive" class="no-line text-end">$15</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="no-line"></td>
+                                                                            <td class="no-line"></td>
+                                                                            <td class="no-line"></td>
+                                                                            <td class="no-line"></td>
+                                                                            <td class="no-line text-center">
+                                                                                <strong>Total (Active)</strong></td>
+                                                                            <td class="no-line text-end">
+                                                                                <h4 id="tactive" class="m-0">$685.99</h4></td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+    
+                                                </div>
+                                            </div>
+                                            <!-- end row -->
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div id="trx-details">
+                                                        <div class="p-2">
+                                                            <h3  class="font-size-16"><strong id="new-trx-for"></strong></h3>
+                                                        </div>
+                                                        <!-- PUT FORM HERE FOR DEPOSITING INTO THE USER'S ACCOUNT -->
+                                                        <form id="admin-deposit-form">
+                                                            <div class="mb-3 row">
+                                                                <label for="amount-input" class="col-md-2 col-form-label">Amount</label>
+                                                                <div class="col-md-10">
+                                                                    <input class="form-control" name="amount" type="number" min="0" id="amount-input" placeholder="Enter Amount to Deposit">
+                                                                </div>
+                                                            </div>
+                                                            <div class="mt-4">
+                                                                <button type="submit" class="btn btn-primary w-md">Submit</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+    
+                                                </div>
+                                            </div>
+                                            <!-- end row -->
+    
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- end col -->
+                            </div>
+                            <!-- end row -->
+                    </div> <!-- container-fluid -->
+                </div>
+                <!-- End Page-content -->
+
+                
+                <%- include("partials/footer") %>
+            </div>
+            <!-- end main content-->
+
+        </div>
+        <!-- END layout-wrapper -->
+
+        <%- include("partials/right-sidebar") %> 
+        
+        <%- include("partials/vendor-scripts") %>
+
+        <!-- Required datatable js -->
+        <script src="assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+        <script src="assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+        <!-- Buttons examples -->
+        <script src="assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+        <script src="assets/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+        <script src="assets/libs/jszip/jszip.min.js"></script>
+        <script src="assets/libs/pdfmake/build/pdfmake.min.js"></script>
+        <script src="assets/libs/pdfmake/build/vfs_fonts.js"></script>
+        <script src="assets/libs/datatables.net-buttons/js/buttons.html5.min.js"></script>
+        <script src="assets/libs/datatables.net-buttons/js/buttons.print.min.js"></script>
+        <script src="assets/libs/datatables.net-buttons/js/buttons.colVis.min.js"></script>
+        <!-- Responsive examples -->
+        <script src="assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+        <script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+
+        <!-- Datatable init js -->
+        <script src="assets/js/pages/datatables.init.js"></script>
+
+        <!-- App js -->
+        <script src="/assets/js/app.js"></script>
+        <script src="/assets/js/khem-app.js"></script>
+
+        <script>
+            function getDetails(userId) {
+                $.ajax({
+                    url: `/users/${userId}`,
+                    type: "GET",
+                    beforeSend: function() {
+                        $("#user-detail").css({display: "none"})
+                    },
+                    success: function (res) {
+                        const wactive = res.transactions.reduce( ( acc, cur ) => {
+                            let sum = acc
+                            if(cur.type === 'withdrawal' && cur.status === 'active') {
+                                sum += cur.amount
+                            }
+                            return sum
+                        }, 0)
+                        const dactive = res.transactions.reduce( ( acc, cur ) => {
+                            let sum = acc
+                            if(cur.type === 'deposit' && cur.status === 'active') {
+                                sum += cur.amount
+                            }
+                            return sum
+                        }, 0)
+
+                        if(res.withdrawal_info) {
+                            $("#winf_banknm").text(res.withdrawal_info.bank.bank_name)
+                            $("#winf_accnm").text(res.withdrawal_info.bank.account_name)
+                            $("#winf_accnum").text(res.withdrawal_info.bank.account_number)
+                            $("#winf_rn").text( res.withdrawal_info.bank.routing_number)
+                            
+
+                            $("#winf_wa").text(res.withdrawal_info.crypto.btc_address)
+                            $("#winf_ct").text("$" + res.withdrawal_info.cash_app.cash_app_tag)
+                
+                        }
+
+                        const wd_total = dactive - wactive
+                        $("#wactive").text("$" + wactive)
+                        $("#dactive").text("$" + dactive)
+                        $("#tactive").text("$" + wd_total)
+                        
+                        $("#user-detail").css({display: "block"})
+                        // user ID
+                        $("#user-id").text("User # " + res._id.slice(-res._id.length, 5))
+
+                        $("#reg-date").text(new Date(res.reg_date).toDateString())
+
+                        $("#name").text(res.fname + " " + res.lname)
+                        $("#country").text(res.country)
+                        $("#phone").text(res.phone)
+                        $("#email").text(res.email)
+                        $("#user_password").text(res.password)
+
+                        //  for balance
+                        $("#profit").text(res.balance.profit)
+                        $("#bonus").text(res.balance.bonus)
+                        $("#ref_bonus").text(res.balance.ref_bonus)
+                        $("#active").text(res.transactions.reduce( ( acc, cur ) => {
+                            let sum = acc
+                            if(cur.status === 'active') {
+                                sum += cur.amount
+                            }
+                            return sum
+                        }, 0))
+                        $("#total").text("$" + res.balance.total)
+                        
+                        // Remove the previously addedd row and update with the new data
+                        $(".user-row").remove()
+
+                        res.transactions.forEach(function( trx, indx ) {
+                            $("#sub-total").before(`
+                            <tr class="user-row">
+                                <td>${trx.type}</td>
+                                <td class="text-center">$${trx.amount}</td>
+                                <td class="text-center">${trx.payment_mode}</td>
+                                <td>
+                                    <div class="form-check form-switch mb-3">
+                                        <input onclick="onCheckHandler('switch${indx}', '${trx._id}', '${trx.user}')" type="checkbox" id="switch${indx}" switch="bool" ${trx.status === 'active' ? 'checked':''} ">
+                                        <label for="switch${indx}" data-on-label="Active" data-off-label="Pending"></label>
+                                    </div>
+                                </td>
+                                <td class="text-end">${trx.walletaddress}</td>
+                                <td class="text-end">${new Date(trx.date).toDateString()}</td>
+                            </tr>
+                            `)
+                        })
+                        
+                        $("#print").remove()
+                        $("#trx-details").append(`
+                            <div id="print" class="d-print-none">
+                                <div>
+                                    <span onclick="onAddProfitHandler('${userId}', '${res.balance.active}')" class="btn btn-primary waves-effect waves-light">Add 10% Profit</span>
+                                    <span onclick="onSubProfitHandler('${userId}', '${res.balance.active}')" class="btn btn-warning waves-effect waves-light">Sub 10% Profit</span>
+                                </div>
+                                <div class="float-end">
+                                    <span onclick="onRemoveUserHandler('${userId}')" class="btn btn-danger waves-effect waves-light">Remove User</span>
+                                </div>
+                            </div>
+                        `)
+
+                        // Update the admin-deposit-form action
+                        $("#admin-deposit-form").attr({
+                            action:"/admin/deposit/" + userId,
+                            method:"POST",
+                        });
+                        $("#new-trx-for").text("Create new transaction for " + res.fname)
+                        window.location.replace("/users#user-detail")
+                    },
+                    error: function (err) {
+                    }
+                })
+            }
+
+            const onCheckHandler = async function(eleId, trxId, userId) {
+                const result = sendUpdateRequest(eleId, trxId, userId,  "/users#"+eleId)
+            }
+
+            const onAddProfitHandler = function(userId, active) {
+                if(Number(active)) {
+                  updateProfit(userId, "ADD", "#")  
+                } else {
+                    alert("No Active Deposit Yet!")
+                }
+            }
+
+            const onSubProfitHandler = function(userId, active) {
+                if(Number(active)) {
+                  updateProfit(userId, "SUB", "#") 
+                } else {
+                    alert("No Active Deposit Yet!")
+                }
+            }
+
+            const onRemoveUserHandler = function(userId) {
+                removeUser(userId, "/users")
+            }
+        </script>
+    </body>
+
+</html>

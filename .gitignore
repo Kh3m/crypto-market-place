@@ -1,0 +1,11 @@
+# Binatrust
+t.txt
+nodemon.json
+node_modules
+.env
+
+# Binatrust Admin
+public/temp
+try.js
+.space
+Spacefile
